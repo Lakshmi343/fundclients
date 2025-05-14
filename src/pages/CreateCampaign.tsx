@@ -177,7 +177,7 @@
 //               <Title {...titleProps}>Campaign information</Title>
 //               <Paper {...paperProps}>
 //                 <SimpleGrid
-                  
+
 //                   breakpoints={[{ maxWidth: "sm", cols: 1 }]}
 //                 >
 //                   <TextInput label="Title" />
@@ -321,7 +321,7 @@
 //                 </Stack>
 //               </Paper>
 //             </Stepper.Step>
-          
+
 //            <Stepper.Step>
 //               <Paper {...paperProps}>
 //                 <Title {...subTitleProps}>Visibility</Title>
@@ -597,19 +597,19 @@ const CreateCampaignPage = () => {
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("Authentication required. Please login.");
       }
 
-      const socialLinks = socialForm.values.links.map(link => ({
+      const socialLinks = socialForm.values.links.map((link) => ({
         platform: link.platform,
-        url: link.url
+        url: link.url,
       }));
 
-      const response = await fetch("/api/campaigns", {
+      const response = await fetch("http://localhost:5000/api/campaigns", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -631,7 +631,9 @@ const CreateCampaignPage = () => {
       setTimeout(() => navigate(`/campaigns/${data._id}`), 1500);
     } catch (err) {
       console.error("Error creating campaign:", err);
-      setError(err instanceof Error ? err.message : "An unknown error occurred");
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
     } finally {
       setLoading(false);
     }
@@ -696,7 +698,7 @@ const CreateCampaignPage = () => {
           <Title mb="xl" align="center">
             Create your campaign
           </Title>
-          
+
           {error && (
             <Notification
               icon={<IconX size={18} />}
@@ -708,7 +710,7 @@ const CreateCampaignPage = () => {
               {error}
             </Notification>
           )}
-          
+
           {success && (
             <Notification
               icon={<IconCheck size={18} />}
@@ -792,7 +794,9 @@ const CreateCampaignPage = () => {
 
                   <FileDropzone
                     label="Upload campaign image"
-                    onUpload={(files) => form.setFieldValue("image", files[0]?.name || "")}
+                    onUpload={(files) =>
+                      form.setFieldValue("image", files[0]?.name || "")
+                    }
                   />
                 </Stack>
               </Paper>
@@ -907,7 +911,9 @@ const CreateCampaignPage = () => {
                       Description:
                     </Text>
                     <div
-                      dangerouslySetInnerHTML={{ __html: form.values.description }}
+                      dangerouslySetInnerHTML={{
+                        __html: form.values.description,
+                      }}
                     />
                   </Box>
 
