@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -8,21 +9,38 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { motion } from "framer-motion";
-const salesData = [
-  { name: "Jul", sales: 4200 },
-  { name: "Aug", sales: 3800 },
-  { name: "Sep", sales: 5100 },
-  { name: "Oct", sales: 4600 },
-  { name: "Nov", sales: 5400 },
-  { name: "Dec", sales: 7200 },
-  { name: "Jan", sales: 6100 },
-  { name: "Feb", sales: 5900 },
-  { name: "Mar", sales: 6800 },
-  { name: "Apr", sales: 6300 },
-  { name: "May", sales: 7100 },
-  { name: "Jun", sales: 7500 },
-];
-const SalesOverviewChart = () => {
+
+// Define types for the project data
+interface Project {
+  title: string;
+  currentFunding: number;
+  fundingGoal: number;
+  progress: number;
+}
+
+const FundingProgressChart: React.FC = () => {
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  // Fetch the project data from the API
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const response = await fetch("http://localhost:5000/api/projects/");
+      const data = await response.json();
+      if (data.success) {
+        setProjects(data.data);
+      }
+    };
+    fetchProjects();
+  }, []);
+
+  // Prepare the data for the chart
+  const chartData = projects.map((project) => ({
+    name: project.title,
+    currentFunding: project.currentFunding,
+    fundingGoal: project.fundingGoal,
+    progress: ((project.currentFunding / project.fundingGoal) * 100).toFixed(2),
+  }));
+
   return (
     <motion.div
       className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
@@ -30,12 +48,12 @@ const SalesOverviewChart = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <h2 className="text-lg font-medium mb-4 text-gray-100">Sales Overview</h2>
+      <h2 className="text-lg font-medium mb-4 text-gray-100">Funding Progress Overview</h2>
       <div className="h-80">
         <ResponsiveContainer width={"100%"} height={"100%"}>
-          <LineChart data={salesData}>
+          <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#485563" />
-            <XAxis dataKey={"name"} stroke="#9ca3af" />
+            <XAxis dataKey="name" stroke="#9ca3af" />
             <YAxis stroke="#9ca3af" />
             <Tooltip
               contentStyle={{
@@ -46,7 +64,7 @@ const SalesOverviewChart = () => {
             />
             <Line
               type="monotone"
-              dataKey="sales"
+              dataKey="progress"
               stroke="#6366F1"
               strokeWidth={3}
               dot={{ fill: "#6366F1", strokeWidth: 2, r: 6 }}
@@ -59,18 +77,4 @@ const SalesOverviewChart = () => {
   );
 };
 
-export default SalesOverviewChart;
-
-// TODO: IMP POINTS.
-/*
-Chart Structure:
-The chart is wrapped in a motion.div for fade-in and slide-up animations.
-ResponsiveContainer ensures the chart resizes based on its container.
-LineChart: Displays the salesData in a line format.
-CartesianGrid: Adds a grid behind the chart.
-XAxis: Shows month names.
-YAxis: Displays sales numbers.
-Tooltip: Shows details when hovering over data points.
-Line: The actual sales line, with customized stroke and dots.
-In short: This component renders an animated line chart with sales data, including grid lines, axis labels, and a tooltip for interactivity.
- */
+export default FundingProgressChart;

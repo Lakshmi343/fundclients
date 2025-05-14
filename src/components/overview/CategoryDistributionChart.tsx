@@ -7,17 +7,73 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-const categoryData = [
-  { name: "Electronics", value: 4500 },
-  { name: "Clothing", value: 3200 },
-  { name: "Home & Garden", value: 2800 },
-  { name: "Books", value: 2100 },
-  { name: "Sports & Outdoors", value: 1900 },
+const COLORS = [
+  "#6366F1",
+  "#8B5CF6",
+  "#EC4899",
+  "#10B981",
+  "#F59E0B",
+  "#F97316",
+  "#D97706",
+  "#6EE7B7",
+  "#6B7280",
 ];
 
-const COLORS = ["#6366F1", "#8B5CF6", "#EC4899", "#10B981", "#F59E0B"];
+interface Campaign {
+  _id: string;
+  category: string;
+  fundingGoal: number;
+}
+
 const CategoryDistributionChart = () => {
+  const [categoryData, setCategoryData] = useState<
+    { name: string; value: number }[]
+  >([]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/campaigns")
+      .then((response) => {
+        const campaigns: Campaign[] = response.data;
+
+        // Initialize a map to track category totals
+        const categoryMap: Record<string, number> = {
+          Medical: 0,
+          Emergency: 0,
+          Environment: 0,
+          Nonprofit: 0,
+          "Financial emergency": 0,
+          Animals: 0,
+          "Crisis Relief": 0,
+          Technology: 0,
+          "Film & Videos": 0,
+        };
+
+        // Sum the fundingGoal for each category
+        campaigns.forEach((campaign) => {
+          if (categoryMap[campaign.category] !== undefined) {
+            categoryMap[campaign.category] += campaign.fundingGoal;
+          }
+        });
+
+        // Convert categoryMap to an array suitable for the chart
+        const formattedCategoryData = Object.entries(categoryMap).map(
+          ([name, value]) => ({
+            name,
+            value,
+          })
+        );
+
+        setCategoryData(formattedCategoryData);
+      })
+      .catch((error) => {
+        console.error("Error fetching campaigns", error);
+      });
+  }, []);
+
   return (
     <motion.div
       className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"

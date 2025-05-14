@@ -189,13 +189,7 @@ const DashboardPage = () => {
                                 <CampaignsTable/>
                             </Card.Section>
                         </Paper>
-                        <Paper {...paperProps}>
-                            <Card.Section>
-                                <Title {...subTitleProps}>Top Contributors</Title>
-                                <DonatorsTable/>
-                            </Card.Section>
-                            <Card.Section></Card.Section>
-                        </Paper>
+                       
                         <Paper {...paperProps}>
                             <Title {...subTitleProps}>Donations per Category</Title>
                             <YearlyDonationChart/>

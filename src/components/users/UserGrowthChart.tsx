@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -8,17 +9,48 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { motion } from "framer-motion";
+import axios from "axios";
 
-const userGrowthData = [
-  { month: "Jan", users: 1000 },
-  { month: "Feb", users: 1500 },
-  { month: "Mar", users: 2000 },
-  { month: "Apr", users: 3000 },
-  { month: "May", users: 4000 },
-  { month: "Jun", users: 5000 },
-];
+// Utility function to get the month from a date
+const getMonth = (date: string) => new Date(date).toLocaleString('default', { month: 'short' });
 
 const UserGrowthChart = () => {
+  const [userGrowthData, setUserGrowthData] = useState<{ month: string; users: number }[]>([]);
+
+  // Fetch user data from API
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/auth/users");
+      const users = response.data;
+
+      // Process the users data to get the month-wise count
+      const monthWiseCount: { [key: string]: number } = {};
+
+      users.forEach((user: { createdAt: string }) => {
+        const month = getMonth(user.createdAt);
+        if (monthWiseCount[month]) {
+          monthWiseCount[month] += 1;
+        } else {
+          monthWiseCount[month] = 1;
+        }
+      });
+
+      // Convert the month-wise data into an array for the chart
+      const formattedData = Object.entries(monthWiseCount).map(([month, users]) => ({
+        month,
+        users,
+      }));
+
+      setUserGrowthData(formattedData);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
   return (
     <motion.div
       className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
@@ -54,4 +86,5 @@ const UserGrowthChart = () => {
     </motion.div>
   );
 };
+
 export default UserGrowthChart;

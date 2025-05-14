@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Bar,
   BarChart,
@@ -9,74 +10,65 @@ import {
   YAxis,
 } from "recharts";
 import { motion } from "framer-motion";
+import axios from "axios";
 
-const userActivityData = [
-  {
-    name: "Mon",
-    "0-4": 20,
-    "4-8": 40,
-    "8-12": 60,
-    "12-16": 80,
-    "16-20": 100,
-    "20-24": 30,
-  },
-  {
-    name: "Tue",
-    "0-4": 30,
-    "4-8": 50,
-    "8-12": 70,
-    "12-16": 90,
-    "16-20": 110,
-    "20-24": 40,
-  },
-  {
-    name: "Wed",
-    "0-4": 40,
-    "4-8": 60,
-    "8-12": 80,
-    "12-16": 100,
-    "16-20": 120,
-    "20-24": 50,
-  },
-  {
-    name: "Thu",
-    "0-4": 50,
-    "4-8": 70,
-    "8-12": 90,
-    "12-16": 110,
-    "16-20": 130,
-    "20-24": 60,
-  },
-  {
-    name: "Fri",
-    "0-4": 60,
-    "4-8": 80,
-    "8-12": 100,
-    "12-16": 120,
-    "16-20": 140,
-    "20-24": 70,
-  },
-  {
-    name: "Sat",
-    "0-4": 70,
-    "4-8": 90,
-    "8-12": 110,
-    "12-16": 130,
-    "16-20": 150,
-    "20-24": 80,
-  },
-  {
-    name: "Sun",
-    "0-4": 80,
-    "4-8": 100,
-    "8-12": 120,
-    "12-16": 140,
-    "16-20": 160,
-    "20-24": 90,
-  },
-];
+// Utility function to get the hour range (e.g., "0-4", "4-8")
+const getHourRange = (hour: number) => {
+  if (hour >= 0 && hour < 4) return "0-4";
+  if (hour >= 4 && hour < 8) return "4-8";
+  if (hour >= 8 && hour < 12) return "8-12";
+  if (hour >= 12 && hour < 16) return "12-16";
+  if (hour >= 16 && hour < 20) return "16-20";
+  return "20-24";
+};
+
+// Process the API data into the desired format
+const processUserActivityData = (users: any[]) => {
+  const activityData = {
+    Mon: { "0-4": 0, "4-8": 0, "8-12": 0, "12-16": 0, "16-20": 0, "20-24": 0 },
+    Tue: { "0-4": 0, "4-8": 0, "8-12": 0, "12-16": 0, "16-20": 0, "20-24": 0 },
+    Wed: { "0-4": 0, "4-8": 0, "8-12": 0, "12-16": 0, "16-20": 0, "20-24": 0 },
+    Thu: { "0-4": 0, "4-8": 0, "8-12": 0, "12-16": 0, "16-20": 0, "20-24": 0 },
+    Fri: { "0-4": 0, "4-8": 0, "8-12": 0, "12-16": 0, "16-20": 0, "20-24": 0 },
+    Sat: { "0-4": 0, "4-8": 0, "8-12": 0, "12-16": 0, "16-20": 0, "20-24": 0 },
+    Sun: { "0-4": 0, "4-8": 0, "8-12": 0, "12-16": 0, "16-20": 0, "20-24": 0 },
+  };
+
+  users.forEach((user) => {
+    const day = new Date(user.updatedAt).toLocaleString("en-US", { weekday: "short" });
+    const hour = new Date(user.updatedAt).getHours();
+    const range = getHourRange(hour);
+
+    if (activityData[day]) {
+      activityData[day][range]++;
+    }
+  });
+
+  return Object.keys(activityData).map((day) => ({
+    name: day,
+    ...activityData[day],
+  }));
+};
 
 const UserActivityHeatmap = () => {
+  const [userActivityData, setUserActivityData] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Fetch data from API
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/auth/users");
+        const data = response.data;
+        const processedData = processUserActivityData(data);
+        setUserActivityData(processedData);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   return (
     <motion.div
       className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
@@ -84,9 +76,7 @@ const UserActivityHeatmap = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <h2 className="text-xl font-semibold text-gray-100 mb-4">
-        User Activity Heatmap
-      </h2>
+      <h2 className="text-xl font-semibold text-gray-100 mb-4">User Activity Heatmap</h2>
       <div style={{ width: "100%", height: 300 }}>
         <ResponsiveContainer>
           <BarChart data={userActivityData}>
