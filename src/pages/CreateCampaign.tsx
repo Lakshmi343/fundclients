@@ -1,457 +1,4 @@
-// import { Helmet } from "react-helmet";
-// import {
-//   ActionIcon,
-//   Alert,
-//   Anchor,
-//   Box,
-//   Button,
-//   Checkbox,
-//   Container,
-//   Flex,
-//   Group,
-//   NumberInput,
-//   Paper,
-//   PaperProps,
-//   Radio,
-//   SegmentedControl,
-//   Select,
-//   SimpleGrid,
-//   Stack,
-//   Stepper,
-//   Text,
-//   TextInput,
-//   Title,
-//   TitleProps,
-//   useMantineTheme,
-// } from "@mantine/core";
-// import { Link, RichTextEditor } from "@mantine/tiptap";
-// import { useEditor } from "@tiptap/react";
-// import Highlight from "@tiptap/extension-highlight";
-// import StarterKit from "@tiptap/starter-kit";
-// import Underline from "@tiptap/extension-underline";
-// import TextAlign from "@tiptap/extension-text-align";
-// import Superscript from "@tiptap/extension-superscript";
-// import SubScript from "@tiptap/extension-subscript";
-// import React, { forwardRef, useState } from "react";
-// import { DateInput } from "@mantine/dates";
-// import {
-//   IconBrandApple,
-//   IconBrandFacebook,
-//   IconBrandGoogle,
-//   IconBrandLinkedin,
-//   IconBrandPaypal,
-//   IconBrandTwitter,
-//   IconBrandWhatsapp,
-//   IconBrandYoutube,
-//   IconCalendar,
-//   IconCheck,
-//   IconChevronLeft,
-//   IconChevronRight,
-//   IconCurrency,
-//   IconCurrencyDollar,
-//   IconInfoCircleFilled,
-//   IconLink,
-//   IconMail,
-//   IconPlus,
-//   IconTrash,
-// } from "@tabler/icons-react";
-// import {
-//   CategorySelect,
-//   CountrySelect,
-//   CurrencySelect,
-//   FileDropzone,
-// } from "../components";
-// import { randomId } from "@mantine/hooks";
-// import { useForm } from "@mantine/form";
 
-// interface ISocialProps {
-//   icon: React.FC<any>;
-//   title: React.ReactNode;
-// }
-
-// const SocialSelectItem = forwardRef<HTMLDivElement, ISocialProps>(
-//   ({ title, icon: Icon, ...others }: ISocialProps, ref) => (
-//     <div ref={ref} {...others}>
-//       <Group noWrap>
-//         <Icon size={18} stroke={1.5} />
-//         <Text size="sm" transform="capitalize">
-//           {title}
-//         </Text>
-//       </Group>
-//     </div>
-//   )
-// );
-
-// const CreateCampaignPage = () => {
-//   const theme = useMantineTheme();
-//   const [active, setActive] = useState(0);
-//   const [target, setTarget] = useState("deadline");
-//   const [deadlineDate, setDeadlineDate] = useState<Date | null>(null);
-//   const [donationType, setDonationType] = useState("any");
-//   const [minimumCheck, setMinimumCheck] = useState(false);
-//   const editor = useEditor({
-//     extensions: [
-//       StarterKit,
-//       Underline,
-//       Link,
-//       Superscript,
-//       SubScript,
-//       Highlight,
-//       TextAlign.configure({ types: ["heading", "paragraph"] }),
-//     ],
-//     content: "",
-//   });
-
-//   const socialForm = useForm({
-//     initialValues: {
-//       employees: [{ name: "", active: false, key: randomId() }],
-//     },
-//   });
-
-//   const nextStep = () =>
-//     setActive((current: number) => (current < 4 ? current + 1 : current));
-//   const prevStep = () =>
-//     setActive((current: number) => (current > 0 ? current - 1 : current));
-
-//   const socialFields = socialForm.values.employees.map((item, index) => (
-//     <Group key={item.key} mt="xs">
-//       <Select
-//         aria-label="social"
-//         data={[
-//           { title: "Facebook", icon: IconBrandFacebook },
-//           { title: "Whatsapp", icon: IconBrandWhatsapp },
-//           { title: "LinkedIn", icon: IconBrandLinkedin },
-//           { title: "Twitter", icon: IconBrandTwitter },
-//           { title: "Youtube", icon: IconBrandYoutube },
-//           { title: "Other links", icon: IconLink },
-//         ].map((c) => ({ value: c.title, label: c.title, ...c }))}
-//         itemComponent={SocialSelectItem}
-//       />
-//       <TextInput
-//         placeholder="https://"
-//         sx={{ flex: 1 }}
-//         {...socialForm.getInputProps(`employees.${index}.name`)}
-//       />
-//       <ActionIcon
-//         color="red"
-//         onClick={() => socialForm.removeListItem("employees", index)}
-//       >
-//         <IconTrash size="1rem" />
-//       </ActionIcon>
-//     </Group>
-//   ));
-
-//   const titleProps: TitleProps = {
-//     size: 24,
-//     mb: "md",
-//   };
-
-//   const subTitleProps: TitleProps = {
-//     size: 18,
-//     mb: "sm",
-//   };
-
-//   const paperProps: PaperProps = {
-//     p: "md",
-//     withBorder: false,
-//     shadow: "sm",
-//     mb: "md",
-//     sx: { backgroundColor: theme.white },
-//   };
-
-//   return (
-//     <>
-//       <Helmet>
-//         <title>Create campaign</title>
-//       </Helmet>
-//       <Box>
-//         <Container my={36}>
-//           <Title mb="xl" align="center">
-//             Create your campaign
-//           </Title>
-//           <Stepper active={active} onStepClick={setActive} breakpoint="sm">
-//             <Stepper.Step
-//               label="Get started"
-//               description="Set essential fundraiser details such as fundraiser title, target and currency"
-//             >
-//               <Title {...titleProps}>Campaign information</Title>
-//               <Paper {...paperProps}>
-//                 <SimpleGrid
-
-//                   breakpoints={[{ maxWidth: "sm", cols: 1 }]}
-//                 >
-//                   <TextInput label="Title" />
-//                   <CategorySelect />
-//                 </SimpleGrid>
-//               </Paper>
-//               <Paper {...paperProps}>
-//                 <Title {...subTitleProps}>Campaign location</Title>
-//                 <Text size="sm" mb="sm">
-//                   Please select the country that we&apos;ll be sending funds to
-//                   (typically where you&apos;re resident). This helps match you
-//                   to the correct payment processors.
-//                 </Text>
-//                 <SimpleGrid
-//                   cols={2}
-//                   breakpoints={[{ maxWidth: "sm", cols: 1 }]}
-//                 >
-//                   <CountrySelect />
-//                   <TextInput label="City" placeholder="city" />
-//                 </SimpleGrid>
-//               </Paper>
-//               <Paper {...paperProps}>
-//                 <Stack spacing="sm">
-//                   <Title {...subTitleProps}>Donation information</Title>
-//                   <CurrencySelect />
-//                   <Radio.Group
-//                     label="What kind of fundraiser would you like to create?"
-//                     value={target}
-//                     onChange={setTarget}
-//                   >
-//                     <Group mt="xs">
-//                       <Radio
-//                         value="deadline"
-//                         label="Fundraiser with a specific end date?"
-//                       />
-//                       <Radio
-//                         value="no-deadline"
-//                         label="Ongoing (no deadline) fundraiser?"
-//                       />
-//                     </Group>
-//                   </Radio.Group>
-//                   <Paper {...paperProps}>
-//                     {target === "deadline" ? (
-//                       <Stack spacing="xs">
-//                         <Text size="sm">
-//                           Fundraiser with a specific end date?
-//                         </Text>
-//                         <Text size="sm">
-//                           This creates urgency and should always be used when
-//                           money is needed before a certain time.
-//                         </Text>
-//                         <DateInput
-//                           value={deadlineDate}
-//                           onChange={setDeadlineDate}
-//                           label="Deadline"
-//                           placeholder="Date input"
-//                           icon={<IconCalendar size={18} />}
-//                         />
-//                         <NumberInput
-//                           label="Target amount"
-//                           icon={<IconCurrencyDollar size={18} />}
-//                         />
-//                         <Checkbox label="Allow your fundraiser to be funded over the needed amount?" />
-//                       </Stack>
-//                     ) : (
-//                       <Stack spacing="xs">
-//                         <Text size="sm">Ongoing (no deadline) fundraiser?</Text>
-//                         <Text size="sm">
-//                           This should be used if you are collecting money on a
-//                           regular basis.
-//                         </Text>
-//                         <Checkbox
-//                           checked={minimumCheck}
-//                           onChange={(event) =>
-//                             setMinimumCheck(event.currentTarget.checked)
-//                           }
-//                           label="Select this if you would like to set a specific a minimum financial target"
-//                         />
-//                         {minimumCheck && (
-//                           <NumberInput
-//                             label="Target amount"
-//                             icon={<IconCurrencyDollar size={18} />}
-//                           />
-//                         )}
-//                       </Stack>
-//                     )}
-//                   </Paper>
-//                 </Stack>
-//               </Paper>
-//               <Paper {...paperProps}>
-//                 <Title {...subTitleProps}>Donation type</Title>
-//                 <SegmentedControl
-//                   size="md"
-//                   value={donationType}
-//                   onChange={setDonationType}
-//                   data={[
-//                     { label: "Any (popular option)", value: "any" },
-//                     { label: "Minimum", value: "minimum" },
-//                     { label: "Fixed", value: "fixed" },
-//                   ]}
-//                   mb="sm"
-//                 />
-//                 {donationType === "minimum" ? (
-//                   <NumberInput label="Minimum amount(s)" />
-//                 ) : (
-//                   <NumberInput label="Fixed amount(s)" />
-//                 )}
-//                 <Checkbox
-//                   label="Would you like your fundraising page shown in more than one language?"
-//                   mt="sm"
-//                 />
-//               </Paper>
-//               <Paper {...paperProps}>
-//                 <Stack spacing="sm">
-//                   <Title {...subTitleProps}>Fund & Registration details</Title>
-//                   <Text size="sm">
-//                     *Name of the person receiving funds. For organizations, the
-//                     legal representative name (this can be amended later).
-//                   </Text>
-//                   <SimpleGrid
-//                     cols={2}
-//                     breakpoints={[{ maxWidth: "sm", cols: 1 }]}
-//                   >
-//                     <TextInput label="First name" />
-//                     <TextInput label="Last name" />
-//                   </SimpleGrid>
-//                   <FileDropzone
-//                     label="Upload your profile picture"
-//                     description="This picture will be shown next to your name"
-//                   />
-//                   <Checkbox
-//                     label={
-//                       <>
-//                         I agree to the Fund Harbour{" "}
-//                         <Anchor href="#" target="_blank">
-//                           terms and conditions & privacy policy
-//                         </Anchor>
-//                       </>
-//                     }
-//                   />
-//                 </Stack>
-//               </Paper>
-//             </Stepper.Step>
-
-//            <Stepper.Step>
-//               <Paper {...paperProps}>
-//                 <Title {...subTitleProps}>Visibility</Title>
-//                 <Stack spacing="sm">
-//                   <Checkbox label="Allow your fundraiser to be shown under user created groups." />
-//                   <Checkbox label="Check this box if you would like to hide your campaign on our site. Only those that you send the URL to will be able to find it and donate." />
-//                   <Checkbox label="Check if you would like to stop search engines such as Google indexing this page." />
-//                   <Checkbox label="Check if you would like to add a password to your fundraising page. Only those with the password will be able to view and donate to the campaign." />
-//                 </Stack>
-//               </Paper>
-//               <Paper {...paperProps}>
-//                 <Title {...subTitleProps}>Social media links</Title>
-//                 <Text size="sm">
-//                   Is this fundraiser shown in other places? If so, add links to
-//                   those pages.
-//                 </Text>
-//                 <Box>
-//                   {socialFields.length > 0 ? (
-//                     <Flex mb="xs"></Flex>
-//                   ) : (
-//                     <Text color="dimmed" align="center" my="md">
-//                       Add social media link
-//                     </Text>
-//                   )}
-
-//                   {socialFields}
-
-//                   <Group position="center" mt="md">
-//                     <Button
-//                       leftIcon={<IconPlus size={18} />}
-//                       onClick={() =>
-//                         socialForm.insertListItem("employees", {
-//                           name: "",
-//                           active: false,
-//                           key: randomId(),
-//                         })
-//                       }
-//                       variant="light"
-//                     >
-//                       Add new social link
-//                     </Button>
-//                   </Group>
-//                 </Box>
-//               </Paper>
-//               <Paper {...paperProps}>
-//                 <Select
-//                   label="How did you hear about us?"
-//                   data={[
-//                     "Search engine",
-//                     "Friends & family",
-//                     "Social media",
-//                     "Other",
-//                   ]}
-//                 />
-//               </Paper>
-//             </Stepper.Step>
-//             <Stepper.Step label="Payment methods" description="Get full access">
-//               <Title {...titleProps}>Fundraiser Payment Methods</Title>
-//               <Paper {...paperProps}>
-//                 <Stack spacing="sm">
-//                   <Title {...subTitleProps}>
-//                     Enable payment processors for your fundraising page
-//                   </Title>
-//                   <Alert icon={<IconCurrency size={18} />} color="blue">
-//                     You can enable GGF Card Payments (powered by MangoPay) if
-//                     you switch your currency from GBP to USD{" "}
-//                   </Alert>
-//                   <Text size="sm">Available payment methods</Text>
-//                   <Group>
-//                     <Button
-//                       variant="light"
-//                       leftIcon={<IconBrandPaypal size={18} />}
-//                     >
-//                       Connect with Paypal
-//                     </Button>
-//                     <Button
-//                       variant="light"
-//                       leftIcon={<IconBrandGoogle size={18} />}
-//                     >
-//                       Connect with Google Pay
-//                     </Button>
-//                     <Button
-//                       variant="light"
-//                       leftIcon={<IconBrandApple size={18} />}
-//                     >
-//                       Connect with Apple Pay
-//                     </Button>
-//                   </Group>
-//                 </Stack>
-//               </Paper>
-//             </Stepper.Step>
-//             <Stepper.Completed>
-//               <Title {...titleProps} align="center" my="xl">
-//                 Completed, take a seat while we finish setting up things for you
-//               </Title>
-//             </Stepper.Completed>
-//           </Stepper>
-
-//           <Group position="center" mt="xl">
-//             <Button
-//               variant="default"
-//               onClick={prevStep}
-//               leftIcon={<IconChevronLeft size={18} />}
-//             >
-//               Back
-//             </Button>
-//             {active < 4 ? (
-//               <Button
-//                 onClick={nextStep}
-//                 leftIcon={<IconChevronRight size={18} />}
-//               >
-//                 Next step
-//               </Button>
-//             ) : (
-//               <Button
-//                 component="a"
-//                 href="/dashboard"
-//                 leftIcon={<IconCheck size={18} />}
-//               >
-//                 Launch campaign
-//               </Button>
-//             )}
-//           </Group>
-//         </Container>
-//       </Box>
-//     </>
-//   );
-// };
-
-// export default CreateCampaignPage;
 import { Helmet } from "react-helmet";
 import {
   ActionIcon,
@@ -498,11 +45,16 @@ import {
   IconPlus,
   IconTrash,
   IconX,
+  IconCalendar,
+  IconWorld,
 } from "@tabler/icons-react";
 import { FileDropzone } from "../components";
 import { randomId } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
+import { DatePicker } from "@mantine/dates";
+import countries from "../utils/countries";
+
 
 interface ISocialProps {
   icon: React.FC<any>;
@@ -534,6 +86,32 @@ const categories = [
   { value: "Film & Videos", label: "Film & Videos" },
 ];
 
+interface RewardTier {
+  tier: string;
+  amount: number;
+  description: string;
+}
+
+interface SocialLink {
+  platform: string;
+  url: string;
+  key: string;
+}
+
+interface FormValues {
+  title: string;
+  description: string;
+  fundingGoal: number;
+  category: string;
+  image: File | null;
+  rewards: RewardTier[];
+  socialLinks: Omit<SocialLink, 'key'>[];
+  dueDate: Date | null;
+  country: string;
+}
+
+const API_BASE_URL = "http://localhost:5000/api";
+
 const CreateCampaignPage = () => {
   const theme = useMantineTheme();
   const navigate = useNavigate();
@@ -541,22 +119,28 @@ const CreateCampaignPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const form = useForm({
+  const form = useForm<FormValues>({
     initialValues: {
       title: "",
       description: "",
       fundingGoal: 1000,
       category: "Technology",
-      image: "",
+      image: null,
       rewards: [],
       socialLinks: [],
+      dueDate: null,
+      country: "",
     },
     validate: {
       title: (value) => (!value ? "Title is required" : null),
       description: (value) => (!value ? "Description is required" : null),
       fundingGoal: (value) =>
         value <= 0 ? "Funding goal must be at least $1" : null,
+      category: (value) => (!value ? "Category is required" : null),
+      dueDate: (value) => (!value ? "Due date is required" : null),
+      country: (value) => (!value ? "Country is required" : null),
     },
   });
 
@@ -578,7 +162,7 @@ const CreateCampaignPage = () => {
 
   const socialForm = useForm({
     initialValues: {
-      links: [{ platform: "", url: "", key: randomId() }],
+      links: [{ platform: "", url: "", key: randomId() }] as SocialLink[],
     },
   });
 
@@ -594,6 +178,17 @@ const CreateCampaignPage = () => {
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
 
+  const handleImageUpload = (files: File[]) => {
+    if (files.length > 0) {
+      const file = files[0];
+      form.setFieldValue("image", file);
+      
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
@@ -604,36 +199,77 @@ const CreateCampaignPage = () => {
         throw new Error("Authentication required. Please login.");
       }
 
-      const socialLinks = socialForm.values.links.map((link) => ({
-        platform: link.platform,
-        url: link.url,
-      }));
-
-      const response = await fetch("http://localhost:5000/api/campaigns", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-auth-token": token,
-        },
-        body: JSON.stringify({
-          ...form.values,
-          socialLinks,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to create campaign");
+      // Validate all forms
+      const formErrors = form.validate();
+      if (formErrors.hasErrors) {
+        throw new Error("Please fill all required fields");
       }
 
+      // Prepare form data
+      const formData = new FormData();
+      formData.append("title", form.values.title);
+      formData.append("description", form.values.description);
+      formData.append("fundingGoal", form.values.fundingGoal.toString());
+      formData.append("category", form.values.category);
+      
+      if (form.values.image) {
+        formData.append("image", form.values.image);
+      }
+
+      // Add rewards as JSON string
+      formData.append("rewards", JSON.stringify(form.values.rewards));
+
+      // Add social links as JSON string
+      const validSocialLinks = socialForm.values.links
+        .filter(link => link.platform && link.url)
+        .map(({ key, ...rest }) => rest);
+      formData.append("socialLinks", JSON.stringify(validSocialLinks));
+
+      // Add additional fields
+      if (form.values.dueDate) {
+        formData.append("dueDate", form.values.dueDate.toISOString());
+      }
+      formData.append("country", form.values.country);
+
+      // Check network connection
+      if (!navigator.onLine) {
+        throw new Error("No internet connection. Please check your network.");
+      }
+
+      const response = await fetch(`${API_BASE_URL}/campaigns/add`, {
+        method: "POST",
+        headers: {
+          "x-auth-token": token,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Server error: ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
       setSuccess(true);
       setTimeout(() => navigate(`/campaigns/${data._id}`), 1500);
     } catch (err) {
       console.error("Error creating campaign:", err);
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred"
-      );
+      let errorMessage = "Failed to create campaign";
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        
+        // Handle specific error cases
+        if (err.message.includes("Failed to fetch")) {
+          errorMessage = "Network error. Please check your connection.";
+        } else if (err.message.includes("Server error")) {
+          errorMessage = "Server error. Please try again later.";
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -757,6 +393,25 @@ const CreateCampaignPage = () => {
                     {...form.getInputProps("fundingGoal")}
                   />
 
+                  <DatePicker
+                    label="Due Date"
+                    placeholder="Pick a date"
+                    required
+                    icon={<IconCalendar size={16} />}
+                    minDate={new Date()}
+                    {...form.getInputProps("dueDate")}
+                  />
+
+                  <Select
+                    label="Country"
+                    placeholder="Select country"
+                    required
+                    icon={<IconWorld size={16} />}
+                    data={countries.map(c => ({ value: c, label: c }))}
+                    searchable
+                    {...form.getInputProps("country")}
+                  />
+
                   <Box>
                     <Text size="sm" weight={500} mb={4}>
                       Description
@@ -794,10 +449,21 @@ const CreateCampaignPage = () => {
 
                   <FileDropzone
                     label="Upload campaign image"
-                    onUpload={(files) =>
-                      form.setFieldValue("image", files[0]?.name || "")
-                    }
+                    onUpload={handleImageUpload}
+                    accept={["image/png", "image/jpeg", "image/webp"]}
                   />
+                  {imagePreview && (
+                    <Box mt="sm">
+                      <Text size="sm" mb={4}>
+                        Image Preview:
+                      </Text>
+                      <img
+                        src={imagePreview}
+                        alt="Campaign preview"
+                        style={{ maxWidth: "100%", maxHeight: 200 }}
+                      />
+                    </Box>
+                  )}
                 </Stack>
               </Paper>
             </Stepper.Step>
@@ -905,6 +571,23 @@ const CreateCampaignPage = () => {
                   <Text size="sm">
                     Funding Goal: ${form.values.fundingGoal.toFixed(2)}
                   </Text>
+                  <Text size="sm">
+                    Due Date: {form.values.dueDate?.toLocaleDateString()}
+                  </Text>
+                  <Text size="sm">Country: {form.values.country}</Text>
+
+                  {imagePreview && (
+                    <Box>
+                      <Text size="sm" weight={500} mb={4}>
+                        Campaign Image:
+                      </Text>
+                      <img
+                        src={imagePreview}
+                        alt="Campaign preview"
+                        style={{ maxWidth: "100%", maxHeight: 200 }}
+                      />
+                    </Box>
+                  )}
 
                   <Box>
                     <Text size="sm" weight={500}>
@@ -935,19 +618,21 @@ const CreateCampaignPage = () => {
                     </Box>
                   )}
 
-                  {socialForm.values.links.length > 0 && (
+                  {socialForm.values.links.filter(l => l.platform && l.url).length > 0 && (
                     <Box mt="md">
                       <Text size="sm" weight={500}>
                         Social Links:
                       </Text>
-                      {socialForm.values.links.map((link, index) => (
-                        <Paper key={index} p="sm" mt="sm" withBorder>
-                          <Text>{link.platform}</Text>
-                          <Text size="sm" color="dimmed">
-                            {link.url}
-                          </Text>
-                        </Paper>
-                      ))}
+                      {socialForm.values.links
+                        .filter(link => link.platform && link.url)
+                        .map((link, index) => (
+                          <Paper key={index} p="sm" mt="sm" withBorder>
+                            <Text>{link.platform}</Text>
+                            <Text size="sm" color="dimmed">
+                              {link.url}
+                            </Text>
+                          </Paper>
+                        ))}
                     </Box>
                   )}
                 </Stack>

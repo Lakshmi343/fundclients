@@ -1,4 +1,4 @@
-import { ActionIcon,   Avatar, Box, BoxProps, Burger, Button, Divider, Container, createStyles, Drawer, Group, Header, Menu, rem, ScrollArea, Text, UnstyledButton, FileInput, Modal, TextInput, LoadingOverlay, Notification,} from '@mantine/core';
+import { ActionIcon, Avatar, Box, BoxProps, Burger, Button, Divider, Container, createStyles, Drawer, Group, Header, Menu, rem, ScrollArea, Text, UnstyledButton, FileInput, Modal, TextInput, LoadingOverlay, Notification,} from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import {
     IconBell,
@@ -13,6 +13,8 @@ import {
     IconPhoto,
     IconCheck,
     IconX,
+    IconDashboard,
+    IconPlus
 } from '@tabler/icons-react';
 import { useState, useEffect } from "react";
 import { AppLinks, BrandName, SearchDrawer } from "./index";
@@ -138,7 +140,6 @@ const AppNavbar = ({...others}: IProps) => {
     }>({ show: false, success: false, message: '' });
     const matchesMobile = useMediaQuery('(max-width: 600px)');
 
- 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -246,6 +247,18 @@ const AppNavbar = ({...others}: IProps) => {
         window.location.href = '/login';
     };
 
+    // Function to get role-specific links
+    const getRoleSpecificLinks = () => {
+        if (userData?.role === 'organizer') {
+            return [
+                { label: 'Dashboard', link: '/dashboard', icon: <IconDashboard size={ICON_SIZE} /> },
+                { label: 'Start Campaign', link: '/campaigns/new', icon: <IconPlus size={ICON_SIZE} /> }
+            ];
+        }
+        // Add other role-specific links here if needed
+        return [];
+    };
+
     return (
         <Box {...others}>
             {notification.show && (
@@ -293,7 +306,10 @@ const AppNavbar = ({...others}: IProps) => {
                                 asLink
                                 variant="grayscale"
                             />
-                            <AppLinks className={classes.hiddenMobile}/>
+                            <AppLinks 
+                                className={classes.hiddenMobile}
+                                links={getRoleSpecificLinks()} // Pass role-specific links
+                            />
                         </Group>
                         <Group>
                             <ActionIcon variant="filled" color={theme.white} onClick={toggleSearchDrawer}>
@@ -338,21 +354,25 @@ const AppNavbar = ({...others}: IProps) => {
                                     >
                                         My Profile
                                     </Menu.Item>
-                                    <Menu.Item
-                                        icon={<IconHeart size="0.9rem" color={theme.colors.red[6]} stroke={1.5} />}
-                                    >
-                                        Liked posts
-                                    </Menu.Item>
-                                    <Menu.Item
-                                        icon={<IconStar size="0.9rem" color={theme.colors.yellow[6]} stroke={1.5}/>}
-                                    >
-                                        Saved posts
-                                    </Menu.Item>
-                                    <Menu.Item
-                                        icon={<IconMessage size="0.9rem" color={theme.colors.blue[6]} stroke={1.5}/>}
-                                    >
-                                        Your comments
-                                    </Menu.Item>
+                                    {userData?.role !== 'organizer' && (
+                                        <>
+                                            <Menu.Item
+                                                icon={<IconHeart size="0.9rem" color={theme.colors.red[6]} stroke={1.5} />}
+                                            >
+                                                Liked posts
+                                            </Menu.Item>
+                                            <Menu.Item
+                                                icon={<IconStar size="0.9rem" color={theme.colors.yellow[6]} stroke={1.5}/>}
+                                            >
+                                                Saved posts
+                                            </Menu.Item>
+                                            <Menu.Item
+                                                icon={<IconMessage size="0.9rem" color={theme.colors.blue[6]} stroke={1.5}/>}
+                                            >
+                                                Your comments
+                                            </Menu.Item>
+                                        </>
+                                    )}
 
                                     <Menu.Label>Settings</Menu.Label>
                                     <Menu.Item icon={<IconSettings size="0.9rem" stroke={1.5}/>}>
@@ -382,7 +402,7 @@ const AppNavbar = ({...others}: IProps) => {
                 zIndex={1000000}
             >
                 <ScrollArea h={`calc(100vh - ${rem(0)})`} mx="-md" sx={{backgroundColor: theme.colors.primary[6]}}>
-                    <AppLinks direction='column'/>
+                    <AppLinks direction='column' links={getRoleSpecificLinks()} />
                 </ScrollArea>
             </Drawer>
 
