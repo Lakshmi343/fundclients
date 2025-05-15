@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   AreaChart,
@@ -11,18 +11,53 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const revenueData = [
-  { month: "Jan", revenue: 4000, target: 3800 },
-  { month: "Feb", revenue: 3000, target: 3200 },
-  { month: "Mar", revenue: 5000, target: 4500 },
-  { month: "Apr", revenue: 4500, target: 4200 },
-  { month: "May", revenue: 6000, target: 5500 },
-  { month: "Jun", revenue: 5500, target: 5800 },
-  { month: "Jul", revenue: 7000, target: 6500 },
-];
-
 const RevenueChart = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState("This Month");
+  const [revenueData, setRevenueData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/campaigns/campaigns")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        // Map campaigns to chart data
+        // Each campaign becomes { month: campaign title, revenue: achievedAmount, target: fundingGoal }
+        const chartData = data.campaigns.map((campaign) => ({
+          month: campaign.title,
+          revenue: campaign.achievedAmount,
+          target: campaign.fundingGoal,
+        }));
+        setRevenueData(chartData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching revenue data:", err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [selectedTimeRange]); // you can later adjust this to filter campaigns based on time range if API supports
+
+  if (loading) {
+    return (
+      <div className="text-center text-gray-400 py-10">
+        Loading revenue data...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500 py-10">
+        Error loading data: {error}
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -33,7 +68,7 @@ const RevenueChart = () => {
     >
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-100">
-          Revenue vs Target
+          Revenue vs Target (Campaigns)
         </h2>
         <select
           className="bg-gray-700 text-white rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -51,7 +86,7 @@ const RevenueChart = () => {
         <ResponsiveContainer>
           <AreaChart data={revenueData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="month" stroke="#9CA3AF" />
+            <XAxis dataKey="month" stroke="#9CA3AF" interval={0} angle={-30} textAnchor="end" />
             <YAxis stroke="#9CA3AF" />
             <Tooltip
               contentStyle={{

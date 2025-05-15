@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   PieChart,
@@ -8,14 +9,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const channelData = [
-  { name: "Organic Search", value: 4000 },
-  { name: "Paid Search", value: 3000 },
-  { name: "Direct", value: 2000 },
-  { name: "Social Media", value: 2780 },
-  { name: "Referral", value: 1890 },
-  { name: "Email", value: 2390 },
-];
 const COLORS = [
   "#8884d8",
   "#82ca9d",
@@ -23,9 +16,38 @@ const COLORS = [
   "#ff8042",
   "#0088FE",
   "#00C49F",
+  "#A28FD0",
+  "#FFBB28",
+  "#FF8042",
 ];
 
 const ChannelPerformance = () => {
+  const [channelData, setChannelData] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/campaigns/campaigns")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.campaigns && data.campaigns.length > 0) {
+          const totalAchieved = data.campaigns.reduce(
+            (sum, campaign) => sum + campaign.achievedAmount,
+            0
+          );
+          // Map to pie chart data with percentages
+          const chartData = data.campaigns.map((campaign) => ({
+            name: campaign.title,
+            value: campaign.achievedAmount,
+            // percent will be calculated by recharts tooltip & label, but you can calculate if needed here
+            percent: (campaign.achievedAmount / totalAchieved) * 100,
+          }));
+          setChannelData(chartData);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching campaigns:", err);
+      });
+  }, []);
+
   return (
     <motion.div
       className="bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-lg shadow-lg rounded-xl p-6 border border-gray-700"
@@ -34,7 +56,7 @@ const ChannelPerformance = () => {
       transition={{ delay: 0.3 }}
     >
       <h2 className="text-xl font-semibold text-gray-100 mb-4">
-        Channel Performance
+        Channel Performance (Achieved Amount %)
       </h2>
       <div style={{ width: "100%", height: 300 }}>
         <ResponsiveContainer>
@@ -49,6 +71,7 @@ const ChannelPerformance = () => {
               label={({ name, percent }) =>
                 `${name} ${(percent * 100).toFixed(0)}%`
               }
+              isAnimationActive={true}
             >
               {channelData.map((entry, index) => (
                 <Cell
@@ -58,6 +81,7 @@ const ChannelPerformance = () => {
               ))}
             </Pie>
             <Tooltip
+              formatter={(value) => new Intl.NumberFormat().format(value)}
               contentStyle={{
                 backgroundColor: "rgba(31, 41, 55, 0.8)",
                 borderColor: "#4B5563",
@@ -71,4 +95,5 @@ const ChannelPerformance = () => {
     </motion.div>
   );
 };
+
 export default ChannelPerformance;

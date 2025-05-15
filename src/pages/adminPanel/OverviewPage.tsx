@@ -7,6 +7,7 @@ import CategoryDistributionChart from "../../components/overview/CategoryDistrib
 import Header from "../../components/common/Header";
 import StatCard from "../../components/common/StatCard";
 import Stats from "../../components/users/Stats";
+import FundingProgressChart from "../../components/overview/FundingProgressChart";
 
 const OverviewPage = () => {
   return (
@@ -18,7 +19,7 @@ const OverviewPage = () => {
 
       
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <SalesOverviewChart />
+          <FundingProgressChart/>
           <CategoryDistributionChart />
           <SalesChannelChart />
         </div>

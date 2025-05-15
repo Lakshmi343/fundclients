@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -10,15 +11,30 @@ import {
 } from "recharts";
 import { motion } from "framer-motion";
 
-const productPerformanceData = [
-  { name: "Product A", sales: 4000, revenue: 2400, profit: 2400 },
-  { name: "Product B", sales: 3000, revenue: 1398, profit: 2210 },
-  { name: "Product C", sales: 2000, revenue: 9800, profit: 2290 },
-  { name: "Product D", sales: 2780, revenue: 3908, profit: 2000 },
-  { name: "Product E", sales: 1890, revenue: 4800, profit: 2181 },
-];
-
 const ProductPerformance = () => {
+  const [productPerformanceData, setProductPerformanceData] = useState([]);
+
+  useEffect(() => {
+    // Fetch data from API
+    fetch("http://localhost:5000/api/campaigns/campaigns")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.campaigns) {
+          // Transform API data into chart data format
+          const chartData = data.campaigns.map((campaign) => ({
+            name: campaign.title,
+            sales: campaign.achievedAmount,
+            revenue: campaign.fundingGoal,
+            profit: campaign.achievedAmount - campaign.fundingGoal,
+          }));
+          setProductPerformanceData(chartData);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching campaigns:", err);
+      });
+  }, []);
+
   return (
     <motion.div
       className="bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-lg shadow-lg rounded-xl p-6 border border-gray-700"
@@ -43,13 +59,14 @@ const ProductPerformance = () => {
               itemStyle={{ color: "#E5E7EB" }}
             />
             <Legend />
-            <Bar dataKey="sales" fill="#8B5CF6" />
-            <Bar dataKey="revenue" fill="#10B981" />
-            <Bar dataKey="profit" fill="#F59E0B" />
+            <Bar dataKey="sales" fill="#8B5CF6" name="Achieved Amount" />
+            <Bar dataKey="revenue" fill="#10B981" name="Funding Goal" />
+            <Bar dataKey="profit" fill="#F59E0B" name="Profit" />
           </BarChart>
         </ResponsiveContainer>
       </div>
     </motion.div>
   );
 };
+
 export default ProductPerformance;

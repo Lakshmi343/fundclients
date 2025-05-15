@@ -29,43 +29,31 @@ interface Campaign {
 }
 
 const CategoryDistributionChart = () => {
-  const [categoryData, setCategoryData] = useState<
-    { name: string; value: number }[]
-  >([]);
+  const [categoryData, setCategoryData] = useState<{ name: string; value: number }[]>([]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/campaigns")
+      .get("http://localhost:5000/api/campaigns/campaigns")  // note your actual endpoint
       .then((response) => {
-        const campaigns: Campaign[] = response.data;
+        const campaigns: Campaign[] = response.data.campaigns;  // Access campaigns array here
 
-        // Initialize a map to track category totals
-        const categoryMap: Record<string, number> = {
-          Medical: 0,
-          Emergency: 0,
-          Environment: 0,
-          Nonprofit: 0,
-          "Financial emergency": 0,
-          Animals: 0,
-          "Crisis Relief": 0,
-          Technology: 0,
-          "Film & Videos": 0,
-        };
+        // Dynamically aggregate fundingGoal by category
+        const categoryMap: Record<string, number> = {};
 
-        // Sum the fundingGoal for each category
         campaigns.forEach((campaign) => {
-          if (categoryMap[campaign.category] !== undefined) {
+          if (campaign.category) {
+            if (!categoryMap[campaign.category]) {
+              categoryMap[campaign.category] = 0;
+            }
             categoryMap[campaign.category] += campaign.fundingGoal;
           }
         });
 
-        // Convert categoryMap to an array suitable for the chart
-        const formattedCategoryData = Object.entries(categoryMap).map(
-          ([name, value]) => ({
-            name,
-            value,
-          })
-        );
+        // Convert to array for Recharts
+        const formattedCategoryData = Object.entries(categoryMap).map(([name, value]) => ({
+          name,
+          value,
+        }));
 
         setCategoryData(formattedCategoryData);
       })
@@ -81,29 +69,22 @@ const CategoryDistributionChart = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <h2 className="text-lg font-medium mb-4 text-gray-100">
-        Category Distribution
-      </h2>
+      <h2 className="text-lg font-medium mb-4 text-gray-100">Category Distribution</h2>
       <div className="h-80">
-        <ResponsiveContainer width={"100%"} height={"100%"}>
+        <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={categoryData}
-              cx={"50%"}
-              cy={"50%"}
+              cx="50%"
+              cy="50%"
               labelLine={false}
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"
-              label={({ name, percent }) =>
-                `${name} ${(percent * 100).toFixed(0)}%`
-              }
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
             >
               {categoryData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
             <Tooltip

@@ -63,8 +63,7 @@ const useStyles = createStyles((theme) => ({
 const data = [
     {link: '/create-campaign', label: 'Create New Campaign', icon: IconFolderPlus},
     {link: '/dashboard', label: 'My Dashboard', icon: IconHome},
-    {link: '', label: 'Following Campaigns', icon: IconHeart},
-    {link: '', label: 'Funded Campaigns', icon: IconFileDollar},
+
 ];
 
 const ICON_SIZE = 18

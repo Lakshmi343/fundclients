@@ -36,24 +36,14 @@ const SIDEBAR_ITEMS = [
     color: "#10B981",
     href: "/adminPanel/sales",
   },
-  {
-    name: "Orders",
-    icon: ShoppingCart,
-    color: "#F59E0B",
-    href: "/adminPanel/orders",
-  },
+  
   {
     name: "Analytics",
     icon: TrendingUp,
     color: "#3882F6",
     href: "/adminPanel/analytics",
   },
-  {
-    name: "Settings",
-    icon: Settings,
-    color: "#6EE787",
-    href: "/adminPanel/settings",
-  },
+ 
 ];
 
 const Sidebar = () => {

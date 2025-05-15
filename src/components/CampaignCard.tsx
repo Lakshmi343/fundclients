@@ -18,12 +18,13 @@ const useStyles = createStyles((theme) => ({
   card: {
     position: "relative",
     padding: theme.spacing.lg,
-    backdropFilter: `blur(16px) saturate(180%)`,
+    backdropFilter: "blur(16px) saturate(180%)",
     backgroundColor:
       theme.colorScheme === "dark"
         ? theme.colors.dark[7]
-        : `rgba(255, 255, 255, 0.75)`,
-    border: `2px solid rgba(209, 213, 219, 0.3)`,
+        : "rgba(255, 255, 255, 0.75)",
+    border: "2px solid rgba(209, 213, 219, 0.3)",
+    transition: "all 150ms ease",
 
     [`&:hover .${getStylesRef("image")}`]: {
       transform: "scale(1.03)",
@@ -31,9 +32,8 @@ const useStyles = createStyles((theme) => ({
 
     "&:hover": {
       boxShadow: theme.shadows.xl,
-      border: `2px solid ${theme.colors.primary[7]}`,
+      borderColor: theme.colors.primary[7],
       backgroundColor: theme.colors.primary[0],
-      transition: "all 150ms ease",
     },
   },
 
@@ -54,19 +54,29 @@ interface IProps extends PaperProps {
 
 const CampaignCard = ({ data, showActions }: IProps) => {
   const { classes } = useStyles();
+
   const {
-    image,
     _id,
+    image,
     title,
     contributors,
     description,
     country,
     category,
-    amountRaised,
-    daysLeft,
+    achievedAmount,
+    fundingGoal,
+    investments,
   } = data;
-  debugger;
-  const linkProps = { to: `/campaigns/${_id}`, rel: "noopener noreferrer" };
+
+  const amountRaised = achievedAmount || 0;
+  const totalGoal = fundingGoal || 1;
+  const progress = Math.min((amountRaised / totalGoal) * 100, 100).toFixed(0);
+  const donations = investments?.length || contributors || 0;
+
+  const linkProps = {
+    to: `/campaigns/${_id}`,
+    rel: "noopener noreferrer",
+  };
 
   return (
     <Card
@@ -77,9 +87,15 @@ const CampaignCard = ({ data, showActions }: IProps) => {
       {...linkProps}
       className={classes.card}
     >
-      <Card.Section>
-        <Image src={image} height={280} className={classes.image} />
-      </Card.Section>
+     <Card.Section>
+  <Image 
+  src={image && image.startsWith("http") ? image : `http://localhost:5000${image}`} 
+  height={280} 
+  className={classes.image} 
+  withPlaceholder 
+/>
+
+</Card.Section>
 
       <Card.Section pt={0} px="md" pb="md">
         <Stack>
@@ -88,7 +104,7 @@ const CampaignCard = ({ data, showActions }: IProps) => {
           </Text>
 
           <Group position="apart">
-            <Text size="xs" transform="uppercase" color="dimmed" fw={700}>
+            <Text size="xs" tt="uppercase" color="dimmed" fw={700}>
               {country}
             </Text>
             <Badge variant="dot" color="secondary">
@@ -102,18 +118,16 @@ const CampaignCard = ({ data, showActions }: IProps) => {
             </Text>
           )}
 
-          <Progress value={daysLeft} />
+          <Progress value={+progress} color="green" />
 
           <Flex justify="space-between">
-            <Text>
-              <b>{amountRaised}</b> raised
+            <Text size="sm">
+              <b>${amountRaised}</b> raised
             </Text>
-            <Text>
-              <b>{contributors}</b> donations
+            <Text size="sm">
+              <b>{donations}</b> donations
             </Text>
           </Flex>
-
-          {/*{showActions && <Button>Donate Now</Button>}*/}
         </Stack>
       </Card.Section>
     </Card>

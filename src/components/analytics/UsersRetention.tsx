@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -9,19 +10,43 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { motion } from "framer-motion";
-
-const userRetentionData = [
-  { name: "Week 1", retention: 100 },
-  { name: "Week 2", retention: 75 },
-  { name: "Week 3", retention: 60 },
-  { name: "Week 4", retention: 50 },
-  { name: "Week 5", retention: 45 },
-  { name: "Week 6", retention: 40 },
-  { name: "Week 7", retention: 38 },
-  { name: "Week 8", retention: 35 },
-];
+import axios from "axios";
 
 const UsersRetention = () => {
+  const [campaignData, setCampaignData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/campaigns/campaigns/"
+        );
+        const campaigns = response.data.campaigns;
+
+        // Transform data for chart: calculate % funding achieved
+        const chartData = campaigns.map((campaign) => ({
+          name: campaign.title,
+          fundingPercent: Math.round(
+            (campaign.achievedAmount / campaign.fundingGoal) * 100
+          ),
+          achievedAmount: campaign.achievedAmount,
+          fundingGoal: campaign.fundingGoal,
+        }));
+
+        setCampaignData(chartData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching campaigns:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchCampaigns();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+
   return (
     <motion.div
       className="bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-lg shadow-lg rounded-xl p-6 border border-gray-700"
@@ -30,27 +55,33 @@ const UsersRetention = () => {
       transition={{ delay: 0.5 }}
     >
       <h2 className="text-xl font-semibold text-gray-100 mb-4">
-        User Retention
+        Campaign Funding Progress (%)
       </h2>
       <div style={{ width: "100%", height: 300 }}>
         <ResponsiveContainer>
-          <LineChart data={userRetentionData}>
+          <LineChart data={campaignData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="name" stroke="#9CA3AF" />
-            <YAxis stroke="#9CA3AF" />
+            <XAxis dataKey="name" stroke="#9CA3AF" interval={0} angle={-30} textAnchor="end" height={70} />
+            <YAxis stroke="#9CA3AF" domain={[0, 100]} unit="%" />
             <Tooltip
               contentStyle={{
                 backgroundColor: "rgba(31, 41, 55, 0.8)",
                 borderColor: "#4B5563",
               }}
               itemStyle={{ color: "#E5E7EB" }}
+              formatter={(value, name) =>
+                name === "fundingPercent"
+                  ? `${value}%`
+                  : value.toLocaleString()
+              }
             />
             <Legend />
             <Line
               type="monotone"
-              dataKey="retention"
+              dataKey="fundingPercent"
               stroke="#8B5CF6"
               strokeWidth={2}
+              activeDot={{ r: 8 }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -58,4 +89,5 @@ const UsersRetention = () => {
     </motion.div>
   );
 };
+
 export default UsersRetention;

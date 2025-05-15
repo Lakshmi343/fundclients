@@ -42,8 +42,8 @@ import {
   UserCard,
 } from "../components";
 import { Helmet } from "react-helmet";
-import * as dayjs from "dayjs";
-import * as LocalizedFormat from "dayjs/plugin/localizedFormat";
+import dayjs from "dayjs";
+import LocalizedFormat from "dayjs/plugin/localizedFormat";
 import { notifications } from "@mantine/notifications";
 
 const CampaignDetailsPage = (): JSX.Element => {
@@ -82,9 +82,8 @@ const CampaignDetailsPage = (): JSX.Element => {
         const response = await axios.get(
           `http://localhost:5000/api/campaigns/${id}`
         );
-
         console.log(response.data);
-        setCampaign(response.data);
+        setCampaign(response.data.campaign); // Access the campaign object from response
       } catch (error) {
         console.error("Error fetching campaign data", error);
       }
@@ -94,6 +93,11 @@ const CampaignDetailsPage = (): JSX.Element => {
       fetchCampaignDetails();
     }
   }, [id]);
+
+  // Function to get full image URL
+  const getImageUrl = (path: string) => {
+    return `http://localhost:5000${path}`;
+  };
 
   return (
     <>
@@ -109,30 +113,34 @@ const CampaignDetailsPage = (): JSX.Element => {
                 <Stack>
                   <Card padding="md" shadow="sm">
                     <Card.Section>
-                      <Image src={campaign?.image} height={480} />
+                      <Image 
+                        src={getImageUrl(campaign.image)} 
+                        height={480} 
+                        alt={campaign.title}
+                      />
                     </Card.Section>
                     <Stack mt="md">
-                      <Title>{campaign?.title}</Title>
+                      <Title>{campaign.title}</Title>
                       {!matchesMobile ? (
                         <Flex gap="xs" align="center">
                           <Text size="sm">Fundraise campaign created by</Text>
                           <UnstyledButton component={Anchor}>
                             <Flex gap="xs" align="center">
                               <Avatar
-                                src={campaign?.creator?.image}
+                                src={getImageUrl(campaign.creator.profile.picture)}
                                 radius="xl"
                                 size="sm"
                               />
-                              <Text size="sm">{campaign?.creator?.name}</Text>
+                              <Text size="sm">{campaign.creator.name}</Text>
                             </Flex>
                           </UnstyledButton>
                           <IconSeparator size={18} />
                           <Text component={Anchor} size="sm">
-                            {campaign?.country}
+                            {campaign.country}
                           </Text>
                           <IconSeparator size={18} />
                           <Text component={Anchor} size="sm">
-                            {campaign?.category}
+                            {campaign.category}
                           </Text>
                         </Flex>
                       ) : (
@@ -142,44 +150,47 @@ const CampaignDetailsPage = (): JSX.Element => {
                             <UnstyledButton component={Anchor}>
                               <Flex gap="xs" align="center">
                                 <Avatar
-                                  src={campaign?.creator?.image}
+                                  src={getImageUrl(campaign.creator.profile.picture)}
                                   radius="xl"
                                   size="sm"
                                 />
-                                <Text size="sm">{campaign?.creator?.name}</Text>
+                                <Text size="sm">{campaign.creator.name}</Text>
                               </Flex>
                             </UnstyledButton>
                           </Flex>
                           <Group>
                             <Text size="sm">
-                              Location - <Anchor>{campaign?.country}</Anchor>
+                              Location - <Anchor>{campaign.country}</Anchor>
                             </Text>
                             <Text size="sm">
-                              Category - <Anchor>{campaign?.category}</Anchor>
+                              Category - <Anchor>{campaign.category}</Anchor>
                             </Text>
                           </Group>
                         </Stack>
                       )}
                       <Text {...subTitleProps}>Our story</Text>
-                      <Text size="sm">{campaign?.description}</Text>
+                      <Text size="sm">{campaign.description}</Text>
                       {matchesMobile && (
                         <>
                           <Divider />
                           <Flex align="flex-end" gap="sm">
                             <Title {...titleProps} align="center">
-                              {campaign?.amountRaised}
+                              {campaign.achievedAmount}
                             </Title>
                             <Text fw={500} align="center" color="dimmed">
-                              raised of {campaign?.fundingGoal}
+                              raised of {campaign.fundingGoal}
                             </Text>
                           </Flex>
-                          <Progress value={campaign?.amountRaised} size="md" />
+                          <Progress 
+                            value={(campaign.achievedAmount / campaign.fundingGoal) * 100} 
+                            size="md" 
+                          />
                           <Flex justify="space-between">
                             <Text fw={500}>
-                              {campaign?.amountRaised}% Funded
+                              {Math.round((campaign.achievedAmount / campaign.fundingGoal) * 100)}% Funded
                             </Text>
                             <Text fw={500}>
-                              {campaign?.contributors} Donors
+                              {campaign.investments.length} Donors
                             </Text>
                           </Flex>
                           <Flex align="center" gap="xs">
@@ -213,12 +224,10 @@ const CampaignDetailsPage = (): JSX.Element => {
                                     root: {
                                       backgroundColor: theme.colors.blue[6],
                                       borderColor: theme.colors.blue[6],
-
                                       "&::before": {
                                         backgroundColor: theme.white,
                                       },
                                     },
-
                                     title: { color: theme.white },
                                     description: { color: theme.white },
                                     closeButton: {
@@ -246,11 +255,15 @@ const CampaignDetailsPage = (): JSX.Element => {
                     <Text {...subTitleProps} mb="sm">
                       Organizer
                     </Text>
-                    <UserCard />
+                    <UserCard 
+                      name={campaign.creator.name}
+                      email={campaign.creator.email}
+                      image={getImageUrl(campaign.creator.profile.picture)}
+                    />
                   </Paper>
                   <Paper {...paperProps}>
                     <Text>
-                      Created on {dayjs(campaign?.createdAt).format("LL")}
+                      Created on {dayjs(campaign.createdAt).format("LL")}
                     </Text>
                   </Paper>
                   {!matchesMobile && (
@@ -270,15 +283,22 @@ const CampaignDetailsPage = (): JSX.Element => {
                     <Paper {...paperProps}>
                       <Stack spacing="sm">
                         <Title {...titleProps} align="center">
-                          {campaign?.amountRaised}
+                          {campaign.achievedAmount}
                         </Title>
                         <Text fw={500} align="center" color="dimmed">
-                          raised of {campaign?.fundingGoal}
+                          raised of {campaign.fundingGoal}
                         </Text>
-                        <Progress value={campaign?.amountRaised} size="md" />
+                        <Progress 
+                          value={(campaign.achievedAmount / campaign.fundingGoal) * 100} 
+                          size="md" 
+                        />
                         <Flex justify="space-between">
-                          <Text fw={500}>{campaign?.amountRaised}% Funded</Text>
-                          <Text fw={500}>{campaign?.contributors} Donors</Text>
+                          <Text fw={500}>
+                            {Math.round((campaign.achievedAmount / campaign.fundingGoal) * 100)}% Funded
+                          </Text>
+                          <Text fw={500}>
+                            {campaign.investments.length} Donors
+                          </Text>
                         </Flex>
                         <Button size="xl" onClick={donateOpen}>
                           Donate
@@ -313,10 +333,8 @@ const CampaignDetailsPage = (): JSX.Element => {
                                 root: {
                                   backgroundColor: theme.colors.blue[6],
                                   borderColor: theme.colors.blue[6],
-
                                   "&::before": { backgroundColor: theme.white },
                                 },
-
                                 title: { color: theme.white },
                                 description: { color: theme.white },
                                 closeButton: {
@@ -341,11 +359,11 @@ const CampaignDetailsPage = (): JSX.Element => {
                     <Accordion defaultValue="customization" variant="separated">
                       <Accordion.Item value="customization">
                         <Accordion.Control>
-                          When will {campaign?.creator?.name} get my payment?
+                          When will {campaign.creator.name} get my payment?
                         </Accordion.Control>
                         <Accordion.Panel>
                           Your payment is sent directly to{" "}
-                          {campaign?.creator?.name} so it immediately helps
+                          {campaign.creator.name} so it immediately helps
                           their campaign.
                         </Accordion.Panel>
                       </Accordion.Item>

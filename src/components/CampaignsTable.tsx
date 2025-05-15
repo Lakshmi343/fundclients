@@ -1,144 +1,327 @@
-// import {ICampaign} from "../types";
-// import {Avatar, Group, Text} from "@mantine/core";
-// import campaignsData from "../data/Campaigns.json";
-// import {DataTable} from "mantine-datatable";
-// import {useEffect, useState} from "react";
+// import { useEffect, useState } from "react";
+// import { Avatar, Group, Text, ActionIcon, Tooltip } from "@mantine/core";
+// import { DataTable, DataTableColumn } from "mantine-datatable";
+// import { IconEdit } from "@tabler/icons-react";
 
+// // Interfaces
+// interface IReward {
+//   tier: string;
+//   amount: number;
+//   description: string;
+//   _id: string;
+// }
+
+// interface ISocialLink {
+//   platform: string;
+//   url: string;
+//   _id: string;
+// }
+
+// interface ICreator {
+//   _id: string;
+//   name: string;
+//   email: string;
+//   profile: {
+//     picture: string;
+//   };
+// }
+
+// interface IInvestment {
+//   investor: string;
+//   amount: number;
+//   _id: string;
+//   investedAt: string;
+// }
+
+// export interface ICampaign {
+//   _id: string;
+//   title: string;
+//   description: string;
+//   fundingGoal: number;
+//   achievedAmount: number;
+//   dueDate: string;
+//   country: string;
+//   category: string;
+//   image: string;
+//   rewards: IReward[];
+//   socialLinks: ISocialLink[];
+//   creator: ICreator;
+//   status: string;
+//   investments: IInvestment[];
+//   createdAt: string;
+//   updatedAt: string;
+//   __v: number;
+// }
+
+// // Constants
 // const PAGE_SIZE = 10;
+// const BASE_URL = "http://localhost:5000";
 
 // const CampaignsTable = () => {
-//     const [page, setPage] = useState(1);
-//     const [records, setRecords] = useState(campaignsData.data.slice(0, PAGE_SIZE));
+//   const [page, setPage] = useState(1);
+//   const [records, setRecords] = useState<ICampaign[]>([]);
+//   const [totalRecords, setTotalRecords] = useState(0);
+//   const [loading, setLoading] = useState(false);
 
-//     useEffect(() => {
-//         const from = (page - 1) * PAGE_SIZE;
-//         const to = from + PAGE_SIZE;
-//         setRecords(campaignsData.data.slice(from, to));
-//     }, [page]);
+//   // Fetch campaigns
+//   useEffect(() => {
+//     const fetchCampaigns = async () => {
+//       setLoading(true);
+//       try {
+//         const response = await fetch(`${BASE_URL}/api/campaigns/campaigns`);
+//         const data = await response.json();
+//         if (data.campaigns) {
+//           setTotalRecords(data.campaigns.length);
+//           const from = (page - 1) * PAGE_SIZE;
+//           const to = from + PAGE_SIZE;
+//           setRecords(data.campaigns.slice(from, to));
+//         }
+//       } catch (error) {
+//         console.error("Error fetching campaigns:", error);
+//       }
+//       setLoading(false);
+//     };
 
-//     return (
-//         <DataTable
-//             columns={[
-//                 {
-//                     accessor: 'createdBy',
-//                     render: ({createdBy, createdByImage}: ICampaign) =>
-//                         <Group>
-//                             <Avatar src={createdByImage} alt={`${createdBy} profile avatar`} size="sm" radius="xl"/>
-//                             <Text>{createdBy}</Text>
-//                         </Group>
-//                 },
-//                 {accessor: 'title'},
-//                 {accessor: 'category'},
-//                 {accessor: 'amountRaised'},
-//                 {accessor: 'goal'},
-//                 {accessor: 'contributors'},
-//                 {accessor: 'country'}
-//             ]}
-//             records={records}
-//             totalRecords={campaignsData.data.length}
-//             recordsPerPage={PAGE_SIZE}
-//             page={page}
-//             onPageChange={(p) => setPage(p)}
-//             highlightOnHover
-//             verticalSpacing="sm"
-//         />
-//     );
+//     fetchCampaigns();
+//   }, [page]);
+
+//   // Handle Edit Click
+//   const handleEdit = (campaignId: string) => {
+//     console.log("Edit campaign", campaignId);
+//     // e.g., navigate(`/campaigns/edit/${campaignId}`);
+//   };
+
+//   // Table Columns
+//   const columns: DataTableColumn<ICampaign>[] = [
+//     {
+//       accessor: "creator",
+//       title: "Created By",
+//       render: ({ creator }) => (
+//         <Group>
+//           <Avatar
+//             src={
+//               creator?.profile?.picture
+//                 ? `${BASE_URL}${creator.profile.picture}`
+//                 : undefined
+//             }
+//             alt={`${creator.name} profile`}
+//             size="sm"
+//             radius="xl"
+//           />
+//           <Text>{creator.name}</Text>
+//         </Group>
+//       ),
+//     },
+//     { accessor: "title", title: "Title" },
+//     { accessor: "category", title: "Category" },
+//     {
+//       accessor: "achievedAmount",
+//       title: "Amount Raised",
+//       render: ({ achievedAmount }) => `$${achievedAmount.toLocaleString()}`,
+//     },
+//     {
+//       accessor: "fundingGoal",
+//       title: "Goal",
+//       render: ({ fundingGoal }) => `$${fundingGoal.toLocaleString()}`,
+//     },
+//     {
+//       accessor: "investments",
+//       title: "Contributors",
+//       render: ({ investments }) => investments.length,
+//     },
+//     { accessor: "country", title: "Country" },
+//     {
+//       accessor: "edit",
+//       title: "Edit",
+//       render: ({ _id }) => (
+//         <Tooltip label="Edit Campaign">
+//           <ActionIcon onClick={() => handleEdit(_id)} color="blue" variant="light">
+//             <IconEdit size={18} />
+//           </ActionIcon>
+//         </Tooltip>
+//       ),
+//     },
+//   ];
+
+//   return (
+//     <DataTable
+//       columns={columns}
+//       records={records}
+//       totalRecords={totalRecords}
+//       recordsPerPage={PAGE_SIZE}
+//       page={page}
+//       onPageChange={setPage}
+//       loading={loading}
+//       highlightOnHover
+//       verticalSpacing="sm"
+//     />
+//   );
 // };
 
 // export default CampaignsTable;
 import { useEffect, useState } from "react";
-import { Avatar, Group, Text } from "@mantine/core";
-import { DataTable } from "mantine-datatable";
+import { Avatar, Group, Text, ActionIcon, Tooltip } from "@mantine/core";
+import { DataTable, DataTableColumn } from "mantine-datatable";
+import { IconEdit } from "@tabler/icons-react";
+import { useNavigate } from "react-router-dom";
 
+// Interfaces
+interface IReward {
+  tier: string;
+  amount: number;
+  description: string;
+  _id: string;
+}
+
+interface ISocialLink {
+  platform: string;
+  url: string;
+  _id: string;
+}
+
+interface ICreator {
+  _id: string;
+  name: string;
+  email: string;
+  profile: {
+    picture: string;
+  };
+}
+
+interface IInvestment {
+  investor: string;
+  amount: number;
+  _id: string;
+  investedAt: string;
+}
+
+export interface ICampaign {
+  _id: string;
+  title: string;
+  description: string;
+  fundingGoal: number;
+  achievedAmount: number;
+  dueDate: string;
+  country: string;
+  category: string;
+  image: string;
+  rewards: IReward[];
+  socialLinks: ISocialLink[];
+  creator: ICreator;
+  status: string;
+  investments: IInvestment[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+// Constants
 const PAGE_SIZE = 10;
+const BASE_URL = "http://localhost:5000";
 
 const CampaignsTable = () => {
-  const [campaigns, setCampaigns] = useState<any[]>([]);
-  const [records, setRecords] = useState<any[]>([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [records, setRecords] = useState<ICampaign[]>([]);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Fetch data from API
+  // Fetch campaigns
   useEffect(() => {
     const fetchCampaigns = async () => {
+      setLoading(true);
       try {
-        const res = await fetch("http://localhost:5000/api/campaigns/");
-        const data = await res.json();
+        const response = await fetch(`${BASE_URL}/api/campaigns/campaigns`);
+        const data = await response.json();
 
-        // If the API sends data like { data: [...] }, use data.data
-        const campaignsArray = Array.isArray(data) ? data : data.data || [];
-
-        setCampaigns(campaignsArray);
-        setRecords(campaignsArray.slice(0, PAGE_SIZE));
-        setLoading(false);
+        if (data.campaigns) {
+          setTotalRecords(data.campaigns.length);
+          const from = (page - 1) * PAGE_SIZE;
+          const to = from + PAGE_SIZE;
+          setRecords(data.campaigns.slice(from, to));
+        }
       } catch (error) {
         console.error("Error fetching campaigns:", error);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchCampaigns();
-  }, []);
+  }, [page]);
 
-  // Handle pagination
-  useEffect(() => {
-    const from = (page - 1) * PAGE_SIZE;
-    const to = from + PAGE_SIZE;
-    setRecords(campaigns.slice(from, to));
-  }, [page, campaigns]);
+  // Edit handler
+  const handleEdit = (campaignId: string) => {
+    navigate(`/campaigns/edit/${campaignId}`);
+  };
+
+  // DataTable Columns
+  const columns: DataTableColumn<ICampaign>[] = [
+    {
+      accessor: "creator",
+      title: "Created By",
+      render: ({ creator }) => (
+        <Group spacing="sm">
+          <Avatar
+            src={creator?.profile?.picture ? `${BASE_URL}${creator.profile.picture}` : undefined}
+            alt={creator?.name}
+            size="sm"
+            radius="xl"
+          />
+          <Text size="sm">{creator?.name || "Unknown"}</Text>
+        </Group>
+      ),
+    },
+    { accessor: "title", title: "Title" },
+    { accessor: "category", title: "Category" },
+    {
+      accessor: "achievedAmount",
+      title: "Amount Raised",
+      render: ({ achievedAmount }) => `$${achievedAmount.toLocaleString()}`,
+    },
+    {
+      accessor: "fundingGoal",
+      title: "Goal",
+      render: ({ fundingGoal }) => `$${fundingGoal.toLocaleString()}`,
+    },
+    {
+      accessor: "investments",
+      title: "Contributors",
+      render: ({ investments }) => investments?.length ?? 0,
+    },
+    { accessor: "country", title: "Country" },
+    {
+      accessor: "edit",
+      title: "Edit",
+      render: ({ _id }) => (
+        <Tooltip label="Edit Campaign">
+          <ActionIcon
+            onClick={() => handleEdit(_id)}
+            color="blue"
+            variant="light"
+            aria-label="Edit"
+          >
+            <IconEdit size={18} />
+          </ActionIcon>
+        </Tooltip>
+      ),
+    },
+  ];
 
   return (
     <DataTable
-      withBorder
-      withColumnBorders
-      highlightOnHover
-      verticalSpacing="sm"
-      fetching={loading}
-      columns={[
-        {
-          accessor: "title",
-          title: "Campaign Title",
-        },
-        {
-          accessor: "category",
-        },
-        {
-          accessor: "currentFunding",
-          title: "Amount Raised",
-          render: (row) => row.currentFunding || 0, // Add actual logic to calculate amount raised if needed
-        },
-        {
-          accessor: "fundingGoal",
-          title: "Goal",
-        },
-        {
-          accessor: "creator",
-          title: "Created By",
-          render: ({ creator }) => (
-            <Group>
-              <Avatar
-                src={
-                  creator?.image ||
-                  "https://ui-avatars.com/api/?name=Anonymous&background=random"
-                }
-                radius="xl"
-                size="sm"
-              />
-              <Text>{creator?.name || "Anonymous"}</Text>
-            </Group>
-          ),
-        },
-        {
-          accessor: "country",
-          title: "Country",
-          render: () => "N/A", // Placeholder for country data
-        },
-      ]}
+      columns={columns}
       records={records}
-      totalRecords={campaigns.length}
+      totalRecords={totalRecords}
       recordsPerPage={PAGE_SIZE}
       page={page}
       onPageChange={setPage}
+      loading={loading}
+      highlightOnHover
+      verticalSpacing="sm"
+      striped
+      withBorder
+      borderRadius="md"
     />
   );
 };
